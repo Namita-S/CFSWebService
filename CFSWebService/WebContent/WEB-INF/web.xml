@@ -22,4 +22,10 @@
 		<servlet-name>Jersey Web Application</servlet-name>
 		<url-pattern>/REST/*</url-pattern>
 	</servlet-mapping>
+	
+	<listener>
+		<listener-class>
+			com.team1.webservice.model.Model
+		</listener-class>
+	</listener>
 </web-app>

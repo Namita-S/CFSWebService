@@ -44,5 +44,21 @@
 			<artifactId>jersey-core</artifactId>
 			<version>1.19</version>
 		</dependency>
+
+  <dependency>
+    <groupId>genericdao</groupId>
+    <artifactId>genericdao-3.0.2</artifactId>
+    <version>3.0.2</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/WebContent/WEB-INF/lib/genericdao-3.0.2.jar</systemPath>
+  </dependency>
+  
+    <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-5.0.8</artifactId>
+    <version>5.0.8</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/WebContent/WEB-INF/lib/mysql-connector-java-5.0.8-bin.jar</systemPath>
+  </dependency>
 	</dependencies>
 </project>

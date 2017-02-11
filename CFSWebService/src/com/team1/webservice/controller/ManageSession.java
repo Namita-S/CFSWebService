@@ -18,13 +18,13 @@ import com.team1.webservice.jsonbean.MessageBean;
 import com.team1.webservice.model.Model;
 import com.team1.webservice.model.UserDAO;
 
-@Path("/ManageSession")
-public class LoginAction {
+@Path("/")
+public class ManageSession {
 	private Model model;
 	private UserDAO userDAO;
 	private MessageBean message;
 	
-	public LoginAction() {
+	public ManageSession() {
 		model = new Model();
 		userDAO = model.getUserDAO();
 		message = new MessageBean();
@@ -46,13 +46,10 @@ public class LoginAction {
 				message.setMessage("There seems to be an issue with" + 
 						"the username/password combination that you entered");
 				return message;
-			} else if (user.getRole() != null) {
+			} else {
 				clearSession(request);
-				session.setAttribute("employee", user);
-			} else if (user.getRole() == null) {
-				clearSession(request);
-				session.setAttribute("customer", user);
-			}
+				session.setAttribute("user", user);
+			} 
 			String firstName = user.getFirstName();
 			message.setMessage("Welcome " + firstName);
 		} catch (JSONException e) {
@@ -64,9 +61,22 @@ public class LoginAction {
 		return message;
 	}
 	
+	@POST
+	@Path("logout")
+	@Produces(MediaType.APPLICATION_JSON)
+	public MessageBean logout(@Context HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if (session.getAttribute("user") != null) {
+			clearSession(request);
+			message.setMessage("You have been successfully logged out");
+		} else {
+			message.setMessage("You are not currently logged in");
+		}
+		return message;
+	}
+	
 	private void clearSession(@Context HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		session.setAttribute("customer", null);
-		session.setAttribute("employee", null);
+		session.setAttribute("user", null);
 	}
 }

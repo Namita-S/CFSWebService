@@ -2,32 +2,27 @@ package com.team1.webservice.databean;
 
 import org.genericdao.PrimaryKey;
 
-@PrimaryKey("userName")
+@PrimaryKey("username")
 public class UserBean {
 	private int userID;
-	private String userName;
+	private String username;
 	private String password;
 	private String firstName;
 	private String lastName;
 	private String address;
-
+	private String email;
+	
 	private String city;
 	private String state;
 	private String zip;
 	private String role;
 	private double cash;
 	
-	public double getCash() {
-		return cash;
-	}
-	public void setCash(double cash) {
-		this.cash = cash;
-	}
 	public int getUserID() {
 		return userID;
 	}
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 	public String getPassword() {
 		return password;
@@ -41,6 +36,9 @@ public class UserBean {
 	public String getAddress() {
 		return address;
 	}
+	public String getEmail() {
+		return email;
+	}
 	public String getCity() {
 		return city;
 	}
@@ -53,11 +51,14 @@ public class UserBean {
 	public String getRole() {
 		return role;
 	}
+	public double getCash() {
+		return cash;
+	}
 	public void setUserID(int userID) {
 		this.userID = userID;
 	}
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	public void setPassword(String password) {
 		this.password = password;
@@ -71,6 +72,9 @@ public class UserBean {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	public void setCity(String city) {
 		this.city = city;
 	}
@@ -82,5 +86,8 @@ public class UserBean {
 	}
 	public void setRole(String role) {
 		this.role = role;
+	}
+	public void setCash(double cash) {
+		this.cash = cash;
 	}
 }

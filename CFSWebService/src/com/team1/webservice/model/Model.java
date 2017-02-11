@@ -52,7 +52,7 @@ public class Model {
 				UserBean initEmployee = new UserBean();
 				initEmployee.setFirstName("Jane");
 				initEmployee.setLastName("Admin");
-				initEmployee.setUserName("jadmin");
+				initEmployee.setUsername("jadmin");
 				initEmployee.setPassword("admin");
 				initEmployee.setAddress("123 Main street");
 				initEmployee.setCity("Pittsburgh");

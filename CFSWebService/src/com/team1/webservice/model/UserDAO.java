@@ -13,8 +13,8 @@ public class UserDAO extends GenericDAO<UserBean> {
         super(UserBean.class, tableName, cp);
     }
     
-    public UserBean getUserByUserName(String userName) throws RollbackException {
-        UserBean[] users = match(MatchArg.equals("userName", userName));
+    public UserBean getUserByUsername(String username) throws RollbackException {
+        UserBean[] users = match(MatchArg.equals("username", username));
         if (users.length == 0) {
         	return null;
         }
@@ -23,8 +23,8 @@ public class UserDAO extends GenericDAO<UserBean> {
         return user;
     }
     
-    public boolean verifyUser(String userName, String password) throws RollbackException {
-        UserBean[] users = match(MatchArg.equals("userName", userName),
+    public boolean verifyUser(String username, String password) throws RollbackException {
+        UserBean[] users = match(MatchArg.equals("username", username),
         						 MatchArg.equals("password", password));
         if (users.length == 0) {
         	return false;

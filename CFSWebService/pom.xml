@@ -60,5 +60,19 @@
     <scope>system</scope>
     <systemPath>${project.basedir}/WebContent/WEB-INF/lib/mysql-connector-java-5.0.8-bin.jar</systemPath>
   </dependency>
+  
+  <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl -->
+<dependency>
+    <groupId>org.codehaus.jackson</groupId>
+    <artifactId>jackson-mapper-asl</artifactId>
+    <version>1.9.13</version>
+</dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>1.17</version>
+        </dependency>
+  
 	</dependencies>
 </project>

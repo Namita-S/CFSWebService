@@ -1,35 +1,24 @@
 package com.team1.webservice.model;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.genericdao.ConnectionPool;
 import org.genericdao.DAOException;
 import org.genericdao.RollbackException;
 
-import com.team1.webservice.databean.EmployeeBean;
+import com.team1.webservice.databean.UserBean;
 
-public class Model implements ServletContextListener {
-	private EmployeeDAO employeeDAO;
-	private CusDAO customerDAO;
+public class Model {
+	private UserDAO userDAO;
 	private FundDAO fundDAO;
 	private PositionDAO positionDAO;
 	private TransactionDAO transactionDAO;
-
-	@Override
-	public void contextDestroyed(ServletContextEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void contextInitialized(ServletContextEvent arg0) {
+	
+	public Model() {
 		try {
 			String jdbcDriver = "com.mysql.jdbc.Driver";
 			String jdbcURL = "jdbc:mysql:///test?useSSL=false";
 			
 			ConnectionPool pool = new ConnectionPool(jdbcDriver,jdbcURL);
-			employeeDAO  = new EmployeeDAO(pool, "employee");
-			customerDAO = new CusDAO(pool, "customer");
+			userDAO  = new UserDAO(pool, "user");
 			fundDAO = new FundDAO(pool, "fund");
 			positionDAO = new PositionDAO(pool, "position");
 			transactionDAO = new TransactionDAO(pool, "transaction");
@@ -38,15 +27,10 @@ public class Model implements ServletContextListener {
 		} catch (DAOException e) {
 			System.out.println(e.getMessage());
 		} 
-		System.out.println("Connection with MySQL has been established");
-	}
-	
-	public EmployeeDAO getEmployeeDAO() {
-		return employeeDAO;
 	}
 
-	public CusDAO getCustomerDAO() {
-		return customerDAO;
+	public UserDAO getUserDAO() {
+		return userDAO;
 	}
 	
 	public FundDAO getFundDAO() {
@@ -63,14 +47,19 @@ public class Model implements ServletContextListener {
 	
 	private void generateInitEmployee() {
 		try {
-			EmployeeBean[] employees = employeeDAO.match();
-			if (employees.length == 0) {
-				EmployeeBean initEmployee = new EmployeeBean();
-				initEmployee.setFirstname("Admin");
-				initEmployee.setLastname("Root");
-				initEmployee.setUsername("admin");
+			UserBean[] users = userDAO.match();
+			if (users.length == 0) {
+				UserBean initEmployee = new UserBean();
+				initEmployee.setFirstName("Jane");
+				initEmployee.setLastName("Admin");
+				initEmployee.setUserName("jadmin");
 				initEmployee.setPassword("admin");
-				employeeDAO.create(initEmployee);
+				initEmployee.setAddress("123 Main street");
+				initEmployee.setCity("Pittsburgh");
+				initEmployee.setState("Pa");
+				initEmployee.setZip("15143");
+				initEmployee.setRole("Employee");
+				userDAO.create(initEmployee);
 			}
 		} catch (RollbackException e) {
 			

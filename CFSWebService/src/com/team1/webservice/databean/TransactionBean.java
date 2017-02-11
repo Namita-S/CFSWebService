@@ -1,85 +1,50 @@
 package com.team1.webservice.databean;
 
-import java.sql.Date;
-
 import org.genericdao.PrimaryKey;
 
-@PrimaryKey("transactionid")
+@PrimaryKey("transactionID")
 public class TransactionBean {
-	private int transactionid;
-	private int customerid;
-	private int fundid;
-	private Date executedate;
+	private int transactionID;
+	private int customerID;
+	private int fundID;
 	private double shares;
-	private String transtype;
+	private String transType;
 	private double amount;
-	/**
-	 * transaction status could be: pending/processed/rejected
-	 */
-	private String status;
-
-	public int getTransactionid() {
-		return transactionid;
+	public int getTransactionID() {
+		return transactionID;
 	}
-
-	public void setTransactionid(int i) {
-		transactionid = i;
+	public int getCustomerID() {
+		return customerID;
 	}
-
-	public int getCustomerid() {
-		return customerid;
+	public int getFundID() {
+		return fundID;
 	}
-
-	public void setCustomerid(int i) {
-		customerid = i;
-	}
-
-	public int getFundid() {
-		return fundid;
-	}
-
-	public void setFundid(int i) {
-		fundid = i;
-	}
-
-	public Date getExecutedate() {
-		return executedate;
-	}
-
-	public void setExecutedate(Date s) {
-		executedate = s;
-	}
-
 	public double getShares() {
 		return shares;
 	}
-
-	public void setShares(double i) {
-		shares = i;
+	public String getTransType() {
+		return transType;
 	}
-
-	public String getTranstype() {
-		return transtype;
-	}
-
-	public void setTranstype(String s) {
-		transtype = s;
-	}
-
 	public double getAmount() {
 		return amount;
 	}
-
-	public void setAmount(double i) {
-		amount = i;
+	public void setTransactionID(int transactionID) {
+		this.transactionID = transactionID;
 	}
-
-	public String getStatus() {
-		return status;
+	public void setCustomerID(int customerID) {
+		this.customerID = customerID;
 	}
-
-	public void setStatus(String status) {
-		this.status = status;
+	public void setFundID(int fundID) {
+		this.fundID = fundID;
 	}
-
+	public void setShares(double shares) {
+		this.shares = shares;
+	}
+	public void setTransType(String transType) {
+		this.transType = transType;
+	}
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
+	
 }

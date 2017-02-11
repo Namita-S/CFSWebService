@@ -22,18 +22,6 @@ public class PositionDAO extends GenericDAO<PositionBean> {
         return positions;
     }
     
-    public double getSharesOfPosition(int customerid, int fundid) throws RollbackException {
-    	double shares = 0.0;
-    	PositionBean[] positions = match(MatchArg.equals("customerid", customerid));
-    	for (int i = 0; i < positions.length; i++) {
-    		if (positions[i].getFundid() == fundid) {
-    			shares = positions[i].getShares();
-    			break;
-    		}
-    	}
-    	return shares;
-    }
-    
     public PositionBean getPositionById(int customerid, int fundid) throws RollbackException {
     	PositionBean[] positions = match(MatchArg.equals("customerid", customerid),
     			MatchArg.equals("fundid", fundid));

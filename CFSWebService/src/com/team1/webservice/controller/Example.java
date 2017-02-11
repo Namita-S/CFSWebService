@@ -1,26 +1,36 @@
 package com.team1.webservice.controller;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
-@Path("UserService")
+import com.team1.webservice.jsonbean.LoginBean;
+
+@Path("/UserService")
 public class Example {
 	
 	@Path("user")
 	@GET
-	@Produces("application/json")
+	@Produces({MediaType.APPLICATION_JSON})
 	public Response getUsers() throws JSONException {
-		JSONObject jb = new JSONObject();
+		LoginBean lb = new LoginBean();
+		lb.setUsername("Jianan");
+		lb.setPassword("123");
 		
-		jb.put("name", "username");
-		jb.put("password", "password");
+		return Response.status(200).entity(lb).build();
+	}
+	
+	@Path("user")
+	@POST
+	@Produces({MediaType.APPLICATION_JSON})
+	public Response createUser(LoginBean lb) {
+		String result = "User created: " + lb;
 		
-		String result = jb.toString();
 		return Response.status(200).entity(result).build();
 	}
 }

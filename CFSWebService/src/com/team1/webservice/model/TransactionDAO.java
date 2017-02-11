@@ -1,7 +1,5 @@
 package com.team1.webservice.model;
 
-import java.sql.Date;
-
 import org.genericdao.ConnectionPool;
 import org.genericdao.DAOException;
 import org.genericdao.GenericDAO;
@@ -31,13 +29,5 @@ public class TransactionDAO extends GenericDAO<TransactionBean> {
         	return null;
         }
 		return transactions;
-	}
-	
-	public Date getLastTradingDate(int customerid) throws RollbackException {
-		 TransactionBean[] transactions = match(MatchArg.equals("customerid", customerid));
-		 if (transactions.length == 0) {
-	        	return null;
-	        }
-	    return transactions[transactions.length-1].getExecutedate();
 	}
 }

@@ -2,31 +2,30 @@ package com.team1.webservice.databean;
 
 import org.genericdao.PrimaryKey;
 
-@PrimaryKey("customerid,fundid")
+@PrimaryKey("customerID,fundID")
 public class PositionBean {
-	private int customerid;
-	private int fundid;
+	private int customerID;
+	private int fundID;
 	private double shares;
 	
-	public int getCustomerid() {
-	     return customerid;
-	 }
-	 public void setCustomerid(int i) {
-	     customerid = i;
-	 }
-	 
-	 public int getFundid() {
-	     return fundid;
-	 }
-	 public void setFundid(int i) {
-	     fundid = i;
-	 }
-	 
-	 public double getShares() {
-	     return shares;
-	 }
-	 public void setShares(double i) {
-	     shares = i;
-	 }
-
+	public int getCustomerID() {
+		return customerID;
+	}
+	public int getFundID() {
+		return fundID;
+	}
+	public double getShares() {
+		return shares;
+	}
+	public void setCustomerID(int customerID) {
+		this.customerID = customerID;
+	}
+	public void setFundID(int fundID) {
+		this.fundID = fundID;
+	}
+	public void setShares(double shares) {
+		this.shares = shares;
+	}
+	
+	
 }

@@ -5,11 +5,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.json.JSONException;
 
 import com.team1.webservice.jsonbean.LoginBean;
+import com.team1.webservice.jsonbean.MessageBean;
 
 @Path("/UserService")
 public class Example {
@@ -17,20 +17,20 @@ public class Example {
 	@Path("user")
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
-	public Response getUsers() throws JSONException {
+	public LoginBean getUsers() throws JSONException {
 		LoginBean lb = new LoginBean();
 		lb.setUsername("Jianan");
 		lb.setPassword("123");
 		
-		return Response.status(200).entity(lb).build();
+		return lb;
 	}
 	
-	@Path("user")
+	@Path("user2")
 	@POST
 	@Produces({MediaType.APPLICATION_JSON})
-	public Response createUser(LoginBean lb) {
-		String result = "User created: " + lb;
-		
-		return Response.status(200).entity(result).build();
+	public MessageBean createUser(LoginBean lb) {
+		MessageBean m = new MessageBean();
+		m.setMessage("hello world");
+		return m;
 	}
 }

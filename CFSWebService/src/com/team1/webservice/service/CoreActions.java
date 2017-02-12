@@ -1,5 +1,7 @@
 package com.team1.webservice.service;
 
+import java.util.Calendar;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
@@ -13,13 +15,19 @@ import org.genericdao.RollbackException;
 import org.genericdao.Transaction;
 import org.json.JSONException;
 
+import com.team1.webservice.databean.FundBean;
+import com.team1.webservice.databean.PositionBean;
 import com.team1.webservice.databean.UserBean;
+import com.team1.webservice.jsonbean.BuyFundBean;
 import com.team1.webservice.jsonbean.CreateCustomerBean;
+import com.team1.webservice.jsonbean.CreateFundBean;
 import com.team1.webservice.jsonbean.DepositBean;
 import com.team1.webservice.jsonbean.LoginBean;
 import com.team1.webservice.jsonbean.MessageBean;
+import com.team1.webservice.jsonbean.RequestCheckBean;
 import com.team1.webservice.model.FundDAO;
 import com.team1.webservice.model.Model;
+import com.team1.webservice.model.PositionDAO;
 import com.team1.webservice.model.TransactionDAO;
 import com.team1.webservice.model.UserDAO;
 
@@ -29,6 +37,7 @@ public class CoreActions {
 	private UserDAO userDAO;
 	private FundDAO fundDAO;
 	private TransactionDAO transactionDAO;
+	private PositionDAO positionDAO;
 	private MessageBean message;
 	
 	public CoreActions() {
@@ -36,7 +45,70 @@ public class CoreActions {
 		userDAO = model.getUserDAO();
 		fundDAO = model.getFundDAO();
 		transactionDAO = model.getTransactionDAO();
+		positionDAO = model.getPositionDAO();
 		message = new MessageBean();
+	}
+	
+	@POST
+	@Path("buyFund")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MessageBean buyFund(BuyFundBean bfb, @Context HttpServletRequest request) {
+		if (!isValidCustomer(request)) {
+			return message;
+		}
+		
+		if (!bfb.isValidInput()) {
+			message.setMessage("The input you provided is not valid");
+			return message;
+		}
+		
+		try {
+			UserBean user = (UserBean) request.getSession().getAttribute("user");
+			Transaction.begin();
+			double balance = user.getCash();
+			double buyAmount = Double.parseDouble(bfb.getCashValue());
+			
+			// check if the customer can afford at least one share of the fund
+			String symbol = bfb.getSymbol();
+			FundBean fb = fundDAO.getFundBySymbol(symbol);
+			double price = fb.getPrice();
+			if (buyAmount / price < 1.0) {
+				message.setMessage("You don't have sufficient funds in your account "
+						+ "to make this purchase");
+				Transaction.commit();
+				return message;
+			}
+			
+			// calculate the whole number of shares the customer can buy
+			int shares = (int) Math.floor(buyAmount / price);
+			user.setCash(balance - shares * price);
+			userDAO.update(user);
+			
+			// update position db or create a new position for the customer
+			PositionBean pb = positionDAO.getPositionById(user.getUserID(), fb.getFundID());
+			if (pb != null) {
+				pb.setShares(pb.getShares() + shares);
+				positionDAO.update(pb);
+			} else {
+				PositionBean newPb = new PositionBean();
+				newPb.setCustomerID(user.getUserID());
+				newPb.setShares(shares);
+				newPb.setFundID(fb.getFundID());
+				positionDAO.create(newPb);
+			}
+			
+			Transaction.commit();
+			message.setMessage("The fund has been successfully purchased");
+			
+		} catch (RollbackException e) {
+			message.setMessage(e.getMessage());
+			return message;
+		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
+		}
+		
+		return message;
 	}
 	
 	@POST
@@ -89,6 +161,48 @@ public class CoreActions {
 		} catch (RollbackException e) {
 			message.setMessage(e.getMessage());
 			return message;
+		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
+		}
+		
+		return message;
+	}
+	
+	@POST
+	@Path("createFund")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MessageBean createFund(CreateFundBean cfb, @Context HttpServletRequest request) {
+		if (!isValidEmployee(request)) {
+			return message;
+		} 
+		
+		if (!cfb.isValidInput()) {
+			message.setMessage("The input you provided is not valid");
+			return message;
+		}
+		
+		try {
+			if (fundDAO.getFundBySymbol(cfb.getSymbol()) != null) {
+				message.setMessage("The input you provided is not valid");
+				return message;
+			}
+			
+			FundBean fb = new FundBean();
+			fb.setName(cfb.getName());
+			fb.setSymbol(cfb.getSymbol());
+			fb.setPrice(Double.parseDouble(cfb.getInitValue()));
+			fb.setDateCreated(getSystemTime());
+			Transaction.begin();
+			fundDAO.create(fb);
+			Transaction.commit();
+			
+			message.setMessage("The fund was successfully created");
+		} catch (RollbackException e) {
+			message.setMessage(e.getMessage());
+			return message;
+		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
 		}
 		
 		return message;
@@ -116,6 +230,7 @@ public class CoreActions {
 			UserBean user = userDAO.getUserByUsername(username);
 			if (user == null) {
 				message.setMessage("The input you provided is not valid");
+				Transaction.commit();
 				return message;
 			}
 			
@@ -126,11 +241,12 @@ public class CoreActions {
 			message.setMessage("The check was successfully deposited");
 		} catch (RollbackException e) {
 			message.setMessage(e.getMessage());
+		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
 		}
 		
 		return message;
 	}
-	
 	
 	@POST
 	@Path("login")
@@ -145,7 +261,7 @@ public class CoreActions {
 			
 			boolean isVerified = userDAO.verifyUser(username, password);
 			if (!isVerified) {
-				message.setMessage("There seems to be an issue with" + 
+				message.setMessage("There seems to be an issue with " + 
 						"the username/password combination that you entered");
 				return message;
 			} else {
@@ -177,6 +293,46 @@ public class CoreActions {
 		return message;
 	}
 	
+	@POST
+	@Path("requestCheck")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MessageBean requestCheck(RequestCheckBean rcb, @Context HttpServletRequest request) {
+		if(!isValidCustomer(request)) {
+			return message;
+		}
+		
+		if (!rcb.isValidInput()) {
+			message.setMessage("The input you provided is not valid");
+			return message;
+		}
+		
+		try {
+			Transaction.begin();
+			UserBean user = (UserBean) request.getSession().getAttribute("user");
+			double balance = user.getCash();
+			double requestAmount = Double.parseDouble(rcb.getCashValue());
+			if (balance < requestAmount) {
+				message.setMessage("You don't have sufficient funds in your balance "
+						+ "to cover the requested check");
+				Transaction.commit();
+				return message;
+			}
+			
+			user.setCash(balance - requestAmount);
+			userDAO.update(user);
+			Transaction.commit();
+			message.setMessage("The check has been successfully requested");
+			
+		} catch (RollbackException e) {
+			
+		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
+		}
+		
+		return message;
+	}
+	
 	private boolean isValidEmployee(@Context HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		UserBean user = (UserBean) session.getAttribute("user");
@@ -190,8 +346,28 @@ public class CoreActions {
 		return true;
 	}
 	
+	private boolean isValidCustomer(@Context HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		UserBean user = (UserBean) session.getAttribute("user");
+		if (user == null) {
+			message.setMessage("You are not currently logged in");
+			return false;
+		} else if (user.getRole() != null) {
+			message.setMessage("You must be a customer to perform this action");
+			return false;
+		}
+		return true;
+	}
+	
 	private void clearSession(@Context HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		session.setAttribute("user", null);
+	}
+	
+	private java.sql.Date getSystemTime() {
+		Calendar cal = Calendar.getInstance();
+		java.util.Date date = cal.getTime();
+		java.sql.Date finalDate = new java.sql.Date(date.getTime());
+		return finalDate;
 	}
 }

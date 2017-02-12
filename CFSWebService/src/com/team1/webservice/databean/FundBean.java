@@ -10,8 +10,7 @@ public class FundBean {
 	private String name;
 	private String symbol;
 	private Date dateCreated;
-	
-	private double initValue;
+	private double price;
 	
 	public int getFundID() {
 		return fundID;
@@ -22,8 +21,8 @@ public class FundBean {
 	public String getSymbol() {
 		return symbol;
 	}
-	public double getInitValue() {
-		return initValue;
+	public double getPrice() {
+		return price;
 	}
 	public void setFundID(int fundid) {
 		this.fundID = fundid;
@@ -34,8 +33,8 @@ public class FundBean {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public void setInitValue(double initValue) {
-		this.initValue = initValue;
+	public void setPrice(double initValue) {
+		this.price = initValue;
 	}
 	public Date getDateCreated() {
 		return dateCreated;

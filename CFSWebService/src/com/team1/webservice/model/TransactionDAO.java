@@ -24,7 +24,7 @@ public class TransactionDAO extends GenericDAO<TransactionBean> {
 	}
 	
 	public TransactionBean[] getTransByCusId(int i) throws RollbackException {
-		TransactionBean[] transactions = match(MatchArg.equals("customerid", i));
+		TransactionBean[] transactions = match(MatchArg.equals("customerID", i));
 		if (transactions.length == 0) {
         	return null;
         }

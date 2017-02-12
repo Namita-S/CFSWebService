@@ -15,7 +15,7 @@ public class PositionDAO extends GenericDAO<PositionBean> {
 	}
     
     public PositionBean[] getPositionsOfCustomer(int customerid) throws RollbackException {
-        PositionBean[] positions= match(MatchArg.equals("customerid", customerid));
+        PositionBean[] positions= match(MatchArg.equals("customerID", customerid));
         if (positions.length == 0) {
         	return null;
         }
@@ -23,8 +23,8 @@ public class PositionDAO extends GenericDAO<PositionBean> {
     }
     
     public PositionBean getPositionById(int customerid, int fundid) throws RollbackException {
-    	PositionBean[] positions = match(MatchArg.equals("customerid", customerid),
-    			MatchArg.equals("fundid", fundid));
+    	PositionBean[] positions = match(MatchArg.equals("customerID", customerid),
+    			MatchArg.equals("fundID", fundid));
     	if (positions.length == 0) {
     		return null;
     	}

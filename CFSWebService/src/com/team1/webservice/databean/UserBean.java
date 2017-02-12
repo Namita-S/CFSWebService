@@ -2,7 +2,7 @@ package com.team1.webservice.databean;
 
 import org.genericdao.PrimaryKey;
 
-@PrimaryKey("username")
+@PrimaryKey("userID")
 public class UserBean {
 	private int userID;
 	private String username;

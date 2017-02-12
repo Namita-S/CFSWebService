@@ -392,7 +392,7 @@ public class CoreActions {
 		if (user == null) {
 			message.setMessage("You are not currently logged in");
 			return false;
-		} else if (!user.getRole().equals("Employee")) {
+		} else if (user.getRole() == null) {
 			message.setMessage("You must be an employee to perform this action");
 			return false;
 		}

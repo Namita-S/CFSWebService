@@ -25,10 +25,10 @@ import com.team1.webservice.jsonbean.DepositBean;
 import com.team1.webservice.jsonbean.LoginBean;
 import com.team1.webservice.jsonbean.MessageBean;
 import com.team1.webservice.jsonbean.RequestCheckBean;
+import com.team1.webservice.jsonbean.SellFundBean;
 import com.team1.webservice.model.FundDAO;
 import com.team1.webservice.model.Model;
 import com.team1.webservice.model.PositionDAO;
-import com.team1.webservice.model.TransactionDAO;
 import com.team1.webservice.model.UserDAO;
 
 @Path("/")
@@ -36,7 +36,6 @@ public class CoreActions {
 	private Model model;
 	private UserDAO userDAO;
 	private FundDAO fundDAO;
-	private TransactionDAO transactionDAO;
 	private PositionDAO positionDAO;
 	private MessageBean message;
 	
@@ -44,7 +43,6 @@ public class CoreActions {
 		model = new Model();
 		userDAO = model.getUserDAO();
 		fundDAO = model.getFundDAO();
-		transactionDAO = model.getTransactionDAO();
 		positionDAO = model.getPositionDAO();
 		message = new MessageBean();
 	}
@@ -72,6 +70,11 @@ public class CoreActions {
 			// check if the customer can afford at least one share of the fund
 			String symbol = bfb.getSymbol();
 			FundBean fb = fundDAO.getFundBySymbol(symbol);
+			if (fb == null) { // check if the fund exists
+				message.setMessage("The input you provided is not valid");
+				Transaction.commit();
+				return message;
+			}
 			double price = fb.getPrice();
 			if (buyAmount / price < 1.0) {
 				message.setMessage("You don't have sufficient funds in your account "
@@ -333,6 +336,56 @@ public class CoreActions {
 		return message;
 	}
 	
+	@POST
+	@Path("sellFund")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MessageBean sellFund(SellFundBean sfb, @Context HttpServletRequest request) {
+		if (!isValidCustomer(request)) {
+			return message;
+		}
+		
+		if (!sfb.isValidInput()) {
+			message.setMessage("The input you provided is not valid");
+			return message;
+		}
+		
+		try {
+			UserBean user = (UserBean) request.getSession().getAttribute("user");
+			Transaction.begin();
+			FundBean fb = fundDAO.getFundBySymbol(sfb.getSymbol());
+			if (fb == null) {
+				message.setMessage("The input you provided is not valid");
+				Transaction.commit();
+				return message;
+			}
+			
+			PositionBean pb = positionDAO.getPositionById(user.getUserID(), fb.getFundID());
+			int shares = (int) Integer.parseInt(sfb.getShares());
+			if (pb == null || pb.getShares() < shares) {
+				message.setMessage("You don't have that many shares in your portfolio");
+				Transaction.commit();
+				return message;
+			}
+			
+			double moneyEarned = shares * fb.getPrice();
+			user.setCash(user.getCash() + moneyEarned);
+			userDAO.update(user);
+			pb.setShares(pb.getShares() - shares);
+			positionDAO.update(pb);
+			Transaction.commit();
+			
+			message.setMessage("The shares have been successfully sold");
+			
+		} catch (RollbackException e) {
+			message.setMessage(e.getMessage());
+			return message;
+		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
+		}
+		
+		return message;
+	}
 	private boolean isValidEmployee(@Context HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		UserBean user = (UserBean) session.getAttribute("user");

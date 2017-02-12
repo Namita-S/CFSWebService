@@ -3,6 +3,7 @@ package com.team1.webservice.service;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.genericdao.RollbackException;
 import org.genericdao.Transaction;
@@ -30,6 +32,7 @@ import com.team1.webservice.jsonbean.JacksonFund;
 import com.team1.webservice.jsonbean.LoginBean;
 import com.team1.webservice.jsonbean.MessageBean;
 import com.team1.webservice.jsonbean.PortfolioBean;
+import com.team1.webservice.jsonbean.RequestBean;
 import com.team1.webservice.jsonbean.RequestCheckBean;
 import com.team1.webservice.jsonbean.SellFundBean;
 import com.team1.webservice.model.FundDAO;
@@ -51,6 +54,76 @@ public class CoreActions {
 		fundDAO = model.getFundDAO();
 		positionDAO = model.getPositionDAO();
 		message = new MessageBean();
+	}
+	
+	/**
+	 * This is a general request dispatcher ONLY for passing
+	 * the test script
+	 * @param rb 
+	 * @param request
+	 * @return
+	 */
+	
+	@POST
+	@Path("")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MessageBean dispatcher(RequestBean<?> rb, @Context HttpServletRequest request) {
+		String uri = rb.getUri();
+		@SuppressWarnings("unchecked")
+		LinkedHashMap<String, String> map = (LinkedHashMap<String, String>) rb.getT();
+
+		if (uri.endsWith("login")) {
+			LoginBean lb = new LoginBean();
+			lb.setUsername(map.get("username"));
+			lb.setPassword(map.get("password"));
+			return login(lb, request);
+		} else if (uri.endsWith("logout")) {
+			return logout(request);
+		} else if (uri.endsWith("buyFund")) {
+			BuyFundBean bfb = new BuyFundBean();
+			bfb.setCashValue(map.get("cashValue"));
+			bfb.setSymbol(map.get("symbol"));
+			return buyFund(bfb, request);
+		} else if (uri.endsWith("createCustomerAccount")) {
+			CreateCustomerBean ccb = new CreateCustomerBean();
+			ccb.setAddress(map.get("address"));
+			ccb.setCash(map.get("cash"));
+			ccb.setCity(map.get("city"));
+			ccb.setEmail(map.get("email"));
+			ccb.setFirstName(map.get("fname"));
+			ccb.setLastName(map.get("lname"));
+			ccb.setPassword(map.get("password"));
+			ccb.setState(map.get("state"));
+			ccb.setZip(map.get("zip"));
+			ccb.setUsername(map.get("username"));
+			return createCustomerAccount(ccb, request);
+		} else if (uri.endsWith("createFund")) {
+			CreateFundBean cfb = new CreateFundBean();
+			cfb.setName(map.get("name"));
+			cfb.setSymbol(map.get("symbol"));
+			cfb.setInitValue(map.get("initial_value"));
+			return createFund(cfb, request);
+		} else if (uri.endsWith("depositCheck")) {
+			DepositBean db = new DepositBean();
+			db.setUsername(map.get("username"));
+			db.setCash(map.get("cash"));
+			return depositCheck(db, request);
+		} else if (uri.endsWith("requestCheck")) {
+			RequestCheckBean rcb = new RequestCheckBean();
+			rcb.setCashValue(map.get("cashValue"));
+			return requestCheck(rcb, request);
+		} else if (uri.endsWith("sellFund")) {
+			SellFundBean sfb = new SellFundBean();
+			sfb.setSymbol(map.get("symbol"));
+			sfb.setShares(map.get("numShares"));
+			return sellFund(sfb, request);
+		} else if (uri.endsWith("transitionDay")) {
+			return transitionDay(request);
+		} else if (uri.endsWith("viewPortfolio")) {
+			return viewPortfolio(request);
+		}
+		return message;
 	}
 	
 	@POST
@@ -261,8 +334,9 @@ public class CoreActions {
 	@Path("login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public MessageBean Login(LoginBean loginBean, @Context HttpServletRequest request) {
+	public MessageBean login(LoginBean loginBean, @Context HttpServletRequest request) {
 		HttpSession session = request.getSession();
+		
 		try {
 			String username = loginBean.getUsername();
 			String password = loginBean.getPassword();
@@ -285,6 +359,7 @@ public class CoreActions {
 			message.setMessage(e.getMessage());
 		}
 		
+		Response.status(200).build();
 		return message;
 	}
 	

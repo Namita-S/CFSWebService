@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class PortfolioBean {
+public class PortfolioBean extends MessageBean {
 	
 	@JsonProperty("message")
 	private String message;

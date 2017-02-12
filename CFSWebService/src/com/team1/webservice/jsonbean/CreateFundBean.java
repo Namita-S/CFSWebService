@@ -44,18 +44,7 @@ public class CreateFundBean {
 			}
 			
 		try {
-			double amount = Double.parseDouble(initValue);
-			if (amount < 0.0) {
-				return false;
-			}
-			String[] s = initValue.split("\\.");
-			if (s.length != 2) {
-				return false;
-			}
-			String decimals = s[s.length - 1];
-			if (decimals.length() != 2) {
-				return false;
-			}
+			Double.parseDouble(initValue);
 		} catch (NumberFormatException e) {
 			return false;
 		}

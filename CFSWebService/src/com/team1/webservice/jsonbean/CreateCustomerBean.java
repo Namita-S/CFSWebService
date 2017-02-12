@@ -22,7 +22,7 @@ public class CreateCustomerBean {
 	private String zip;
 	
 	@JsonProperty("cash")
-	private String cash = "0";
+	private String cash = "0.00";
 	
 	@JsonProperty("username")
 	private String username;

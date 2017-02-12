@@ -1,6 +1,8 @@
 package com.team1.webservice.service;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -341,6 +343,7 @@ public class CoreActions {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public MessageBean sellFund(SellFundBean sfb, @Context HttpServletRequest request) {
+
 		if (!isValidCustomer(request)) {
 			return message;
 		}
@@ -376,6 +379,46 @@ public class CoreActions {
 			Transaction.commit();
 			
 			message.setMessage("The shares have been successfully sold");
+			
+		} catch (RollbackException e) {
+			message.setMessage(e.getMessage());
+			return message;
+		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
+		}
+		
+		return message;
+	}
+	
+	@POST
+	@Path("transitionDay")
+	@Produces(MediaType.APPLICATION_JSON)
+	public MessageBean transitionDay(@Context HttpServletRequest request) {
+		if (!isValidEmployee(request)) {
+			return message;
+		} 
+		
+		try {
+			Transaction.begin();
+			FundBean[] fbs = fundDAO.getAllFunds();
+			
+			// return if no fund in db
+			if (fbs == null) {
+				message.setMessage("The fund prices have been successfully recalculated");
+				Transaction.commit();
+				return message;
+			}
+			DecimalFormat df = new DecimalFormat("#.00");
+			for (FundBean fb : fbs) {
+				double price = fb.getPrice();
+				double flucRate = getFlucRate();
+				double newPrice = Double.parseDouble(df.format(price + (price * flucRate)));
+				fb.setPrice(newPrice);
+				fundDAO.update(fb);
+			}
+			
+			Transaction.commit();
+			message.setMessage("The fund prices have been successfully recalculated");
 			
 		} catch (RollbackException e) {
 			message.setMessage(e.getMessage());
@@ -422,5 +465,12 @@ public class CoreActions {
 		java.util.Date date = cal.getTime();
 		java.sql.Date finalDate = new java.sql.Date(date.getTime());
 		return finalDate;
+	}
+	
+	private double getFlucRate() {
+		Random r = new Random();
+		int i = r.nextInt(21) - 10;
+		double rate = i * 0.01;
+		return rate;
 	}
 }

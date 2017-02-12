@@ -405,7 +405,6 @@ public class CoreActions {
 		try {
 			Transaction.begin();
 			FundBean[] fbs = fundDAO.getAllFunds();
-			
 			// return if no fund in db
 			if (fbs == null) {
 				message.setMessage("The fund prices have been successfully recalculated");

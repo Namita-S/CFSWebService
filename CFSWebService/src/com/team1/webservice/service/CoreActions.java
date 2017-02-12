@@ -1,4 +1,4 @@
-package com.team1.webservice.controller;
+package com.team1.webservice.service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -15,6 +15,7 @@ import org.json.JSONException;
 
 import com.team1.webservice.databean.UserBean;
 import com.team1.webservice.jsonbean.CreateCustomerBean;
+import com.team1.webservice.jsonbean.DepositBean;
 import com.team1.webservice.jsonbean.LoginBean;
 import com.team1.webservice.jsonbean.MessageBean;
 import com.team1.webservice.model.FundDAO;
@@ -52,7 +53,6 @@ public class CoreActions {
 		
 		// check if user is a valid employee
 		if (!isValidEmployee(request)) {
-			message.setMessage("You must be an employee to perform this action");
 			return message;
 		}
 		
@@ -89,13 +89,48 @@ public class CoreActions {
 		} catch (RollbackException e) {
 			message.setMessage(e.getMessage());
 			return message;
-		} catch (NumberFormatException e) {
-			message.setMessage(e.getMessage());
-			return message;
 		}
 		
 		return message;
 	}
+	
+	@POST
+	@Path("depositCheck")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MessageBean depositCheck(DepositBean db, @Context HttpServletRequest request) {
+		if (!isValidEmployee(request)) {
+			return message;
+		} 
+		
+		if (!db.isValidInput()) {
+			message.setMessage("The input you provided is not valid");
+			return message;
+		}
+		
+		try {
+			String username = db.getUsername();
+			
+			// lock the db from this point
+			Transaction.begin();
+			UserBean user = userDAO.getUserByUsername(username);
+			if (user == null) {
+				message.setMessage("The input you provided is not valid");
+				return message;
+			}
+			
+			user.setCash(user.getCash() + Double.parseDouble(db.getCash()));
+			userDAO.update(user);
+			// release the lock on db
+			Transaction.commit();
+			message.setMessage("The check was successfully deposited");
+		} catch (RollbackException e) {
+			message.setMessage(e.getMessage());
+		}
+		
+		return message;
+	}
+	
 	
 	@POST
 	@Path("login")
@@ -145,7 +180,11 @@ public class CoreActions {
 	private boolean isValidEmployee(@Context HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		UserBean user = (UserBean) session.getAttribute("user");
-		if (user == null || !user.getRole().equals("Employee")) {
+		if (user == null) {
+			message.setMessage("You are not currently logged in");
+			return false;
+		} else if (!user.getRole().equals("Employee")) {
+			message.setMessage("You must be an employee to perform this action");
 			return false;
 		}
 		return true;

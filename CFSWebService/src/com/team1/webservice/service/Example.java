@@ -1,4 +1,4 @@
-package com.team1.webservice.controller;
+package com.team1.webservice.service;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;

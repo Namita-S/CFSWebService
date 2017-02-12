@@ -1,5 +1,7 @@
 package com.team1.webservice.databean;
 
+import java.sql.Date;
+
 import org.genericdao.PrimaryKey;
 
 @PrimaryKey("fundID")
@@ -7,6 +9,8 @@ public class FundBean {
 	private int fundID;
 	private String name;
 	private String symbol;
+	private Date dateCreated;
+	
 	private double initValue;
 	
 	public int getFundID() {
@@ -32,5 +36,11 @@ public class FundBean {
 	}
 	public void setInitValue(double initValue) {
 		this.initValue = initValue;
+	}
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
 	}
 }

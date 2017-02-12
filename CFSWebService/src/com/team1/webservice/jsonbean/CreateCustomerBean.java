@@ -22,7 +22,7 @@ public class CreateCustomerBean {
 	private String zip;
 	
 	@JsonProperty("cash")
-	private String cash;
+	private String cash = "0";
 	
 	@JsonProperty("username")
 	private String username;
@@ -122,8 +122,24 @@ public class CreateCustomerBean {
 			|| zip == null || zip.length() == 0
 			|| email == null || email.length() == 0
 			|| username == null || username.length() == 0
-			|| password == null || password.length() == 0
-			|| cash == null || cash.length() == 0) {
+			|| password == null || password.length() == 0) {
+			return false;
+		} 
+		
+		try {
+			double amount = Double.parseDouble(cash);
+			if (amount < 0.0) {
+				return false;
+			}
+			String[] s = cash.split("\\.");
+			if (s.length != 2) {
+				return false;
+			}
+			String decimals = s[s.length - 1];
+			if (decimals.length() != 2) {
+				return false;
+			}
+		} catch (NumberFormatException e) {
 			return false;
 		}
 		return true;

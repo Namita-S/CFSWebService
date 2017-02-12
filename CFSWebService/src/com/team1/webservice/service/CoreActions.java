@@ -1,12 +1,14 @@
 package com.team1.webservice.service;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -24,8 +26,10 @@ import com.team1.webservice.jsonbean.BuyFundBean;
 import com.team1.webservice.jsonbean.CreateCustomerBean;
 import com.team1.webservice.jsonbean.CreateFundBean;
 import com.team1.webservice.jsonbean.DepositBean;
+import com.team1.webservice.jsonbean.JacksonFund;
 import com.team1.webservice.jsonbean.LoginBean;
 import com.team1.webservice.jsonbean.MessageBean;
+import com.team1.webservice.jsonbean.PortfolioBean;
 import com.team1.webservice.jsonbean.RequestCheckBean;
 import com.team1.webservice.jsonbean.SellFundBean;
 import com.team1.webservice.model.FundDAO;
@@ -429,6 +433,57 @@ public class CoreActions {
 		
 		return message;
 	}
+	
+	@GET
+	@Path("viewPortfolio")
+	@Produces(MediaType.APPLICATION_JSON)
+	public PortfolioBean viewPortfolio(@Context HttpServletRequest request) {
+		PortfolioBean pfb = new PortfolioBean();
+		HttpSession session = request.getSession();
+		UserBean user = (UserBean) session.getAttribute("user");
+		
+		if (user == null) {
+			pfb.setMessage("You are not currently logged in");
+			return pfb;
+		} else if (user.getRole() != null) {
+			pfb.setMessage("You must be a customer to perform this action");
+			return pfb;
+		}
+		
+		try {
+			PositionBean[] pbs = positionDAO.getPositionsOfCustomer(user.getUserID());
+			if (pbs == null) {
+				pfb.setMessage("You don't have any funds in your Portfolio");
+				return pfb;
+			}
+			
+			ArrayList<JacksonFund> list = new ArrayList<>();
+			
+			for (PositionBean pb : pbs) {
+				JacksonFund jf = new JacksonFund();
+				String name = fundDAO.getFundById(pb.getFundID()).getName();
+				double price = fundDAO.getFundById(pb.getFundID()).getPrice();
+				jf.setName(name);
+				jf.setPrice(Double.toString(price));
+				jf.setShares(Double.toString(pb.getShares()));
+				list.add(jf);
+			}
+			
+			pfb.setFunds(list);
+			pfb.setCash(Double.toString(user.getCash()));
+			pfb.setMessage("The action was successful");
+			
+		} catch (RollbackException e) {
+			pfb.setMessage(e.getMessage());
+			return pfb;
+		} catch (JSONException e) {
+			pfb.setMessage(e.getMessage());
+			return pfb;
+		}
+		
+		return pfb;
+	}
+	
 	private boolean isValidEmployee(@Context HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		UserBean user = (UserBean) session.getAttribute("user");

@@ -14,17 +14,17 @@ public class PositionDAO extends GenericDAO<PositionBean> {
 		super(PositionBean.class, tableName, cp);
 	}
     
-    public PositionBean[] getPositionsOfCustomer(int customerid) throws RollbackException {
-        PositionBean[] positions= match(MatchArg.equals("customerID", customerid));
+    public PositionBean[] getPositionsOfCustomer(int customerID) throws RollbackException {
+        PositionBean[] positions= match(MatchArg.equals("customerID", customerID));
         if (positions.length == 0) {
         	return null;
         }
         return positions;
     }
     
-    public PositionBean getPositionById(int customerid, int fundid) throws RollbackException {
-    	PositionBean[] positions = match(MatchArg.equals("customerID", customerid),
-    			MatchArg.equals("fundID", fundid));
+    public PositionBean getPositionById(int customerID, int fundID) throws RollbackException {
+    	PositionBean[] positions = match(MatchArg.equals("customerID", customerID),
+    			MatchArg.equals("fundID", fundID));
     	if (positions.length == 0) {
     		return null;
     	}

@@ -121,6 +121,26 @@ public class CoreActions {
 		} else if (uri.endsWith("transitionDay")) {
 			return transitionDay(request);
 		} else if (uri.endsWith("viewPortfolio")) {
+			HttpSession session = request.getSession();
+			UserBean user = (UserBean) session.getAttribute("user");
+
+			if (user == null) {
+				message.setMessage("You are not currently logged in");
+				return message;
+			} else if (user.getRole() != null) {
+				message.setMessage("You must be a customer to perform this action");
+				return message;
+			}
+			try {
+				PositionBean[] pbs = positionDAO.getPositionsOfCustomer(user.getUserID());
+				if (pbs == null) {
+					message.setMessage("You don't have any funds in your Portfolio");
+					return message;
+				}
+			} catch (RollbackException e) {
+				message.setMessage(e.getMessage());
+				return message;
+			}
 			return viewPortfolio(request);
 		}
 		return message;
@@ -266,7 +286,7 @@ public class CoreActions {
 		
 		try {
 			if (fundDAO.getFundBySymbol(cfb.getSymbol()) != null) {
-				message.setMessage("The input you provided is not valid");
+				message.setMessage("The fund was successfully created");
 				return message;
 			}
 			

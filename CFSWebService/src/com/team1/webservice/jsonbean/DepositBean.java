@@ -37,11 +37,11 @@ public class DepositBean {
 				return false;
 			}
 			String[] s = cash.split("\\.");
-			if (s.length != 2) {
+			if (s.length > 2) {
 				return false;
 			}
 			String decimals = s[s.length - 1];
-			if (decimals.length() != 2) {
+			if (decimals.length() > 2) {
 				return false;
 			}
 		} catch (NumberFormatException e) {

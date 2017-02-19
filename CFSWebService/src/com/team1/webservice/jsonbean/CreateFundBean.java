@@ -49,11 +49,11 @@ public class CreateFundBean {
 				return false;
 			}
 			String[] s = initValue.split("\\.");
-			if (s.length != 2) {
+			if (s.length > 2) {
 				return false;
 			}
 			String decimals = s[s.length - 1];
-			if (decimals.length() != 2) {
+			if (decimals.length() > 2) {
 				return false;
 			}
 		} catch (NumberFormatException e) {

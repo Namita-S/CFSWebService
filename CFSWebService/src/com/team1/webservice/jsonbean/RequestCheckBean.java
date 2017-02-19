@@ -26,11 +26,11 @@ public class RequestCheckBean {
 				return false;
 			}
 			String[] s = cashValue.split("\\.");
-			if (s.length != 2) {
+			if (s.length > 2) {
 				return false;
 			}
 			String decimals = s[s.length - 1];
-			if (decimals.length() != 2) {
+			if (decimals.length() > 2) {
 				return false;
 			}
 			

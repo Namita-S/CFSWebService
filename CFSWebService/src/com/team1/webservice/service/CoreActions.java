@@ -176,7 +176,13 @@ public class CoreActions {
 			}
 			double price = fb.getPrice();
 			if (buyAmount / price < 1.0) {
-				message.setMessage("You don't have sufficient funds in your account "
+				message.setMessage("You didn't provide enough cash to make this purchase");
+				Transaction.commit();
+				return message;
+			}
+			//check if specified # of shares can be bought for entered amount
+			if(buyAmount > balance) {
+				message.setMessage("You don't have enough cash in your account "
 						+ "to make this purchase");
 				Transaction.commit();
 				return message;

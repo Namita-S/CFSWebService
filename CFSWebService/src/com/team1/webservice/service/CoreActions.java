@@ -292,7 +292,7 @@ public class CoreActions {
 		
 		try {
 			if (fundDAO.getFundBySymbol(cfb.getSymbol()) != null) {
-				message.setMessage("The fund was successfully created");
+				message.setMessage("The input you provided is not valid");
 				return message;
 			}
 			

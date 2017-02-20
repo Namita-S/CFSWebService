@@ -48,8 +48,8 @@ public class CreateFundBean {
 			if (amount < 0.0) {
 				return false;
 			}
-			String stramt = Double.toString(amount);
-			String[] s = stramt.split("\\.");
+
+			String[] s = initValue.split("\\.");
 			if (s.length > 2) {
 				return false;
 			}

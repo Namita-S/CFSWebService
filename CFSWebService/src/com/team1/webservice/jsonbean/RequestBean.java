@@ -4,7 +4,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class RequestBean<T> {
 	
-	@JsonProperty("uri")
+	@JsonProperty("url")
 	private String uri;
 	
 	@JsonProperty("method")

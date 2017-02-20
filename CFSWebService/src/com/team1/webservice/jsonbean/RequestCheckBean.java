@@ -25,7 +25,8 @@ public class RequestCheckBean {
 			if (amount < 0.0) {
 				return false;
 			}
-			String[] s = cashValue.split("\\.");
+			String stramt = Double.toString(amount);
+			String[] s = stramt.split("\\.");
 			if (s.length > 2) {
 				return false;
 			}

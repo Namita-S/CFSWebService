@@ -131,7 +131,8 @@ public class CreateCustomerBean {
 			if (amount < 0.0) {
 				return false;
 			}
-			String[] s = cash.split("\\.");
+			String stramt = Double.toString(amount);
+			String[] s = stramt.split("\\.");
 			if (s.length > 2) {
 				return false;
 			}

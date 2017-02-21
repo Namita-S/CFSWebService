@@ -34,10 +34,17 @@ public class BuyFundBean {
 			}
 			
 			String[] s = cashValue.split("\\.");
-			if (s.length != 2) {
+			if (s.length > 2) {
 				return false;
 			}
-			String decimals = s[s.length - 1];
+			
+			String decimals="";
+			if (s.length == 2) {
+				decimals = s[s.length - 1];
+			} else if (s.length == 1) {
+				decimals = s[0];
+			}
+			
 			if (decimals.length() > 2) {
 				return false;
 			}

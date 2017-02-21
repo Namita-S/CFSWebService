@@ -3,6 +3,7 @@ package com.team1.webservice.model;
 import org.genericdao.ConnectionPool;
 import org.genericdao.DAOException;
 import org.genericdao.RollbackException;
+import org.genericdao.Transaction;
 
 import com.team1.webservice.databean.UserBean;
 
@@ -47,6 +48,7 @@ public class Model {
 	
 	private void generateInitEmployee() {
 		try {
+			Transaction.begin();
 			UserBean[] users = userDAO.match();
 			if (users.length == 0) {
 				UserBean initEmployee = new UserBean();
@@ -61,6 +63,7 @@ public class Model {
 				initEmployee.setRole("Employee");
 				userDAO.create(initEmployee);
 			}
+			Transaction.commit();
 		} catch (RollbackException e) {
 			
 		}

@@ -38,7 +38,7 @@ public class DepositBean {
 			}
 
 			String[] s = cash.split("\\.");
-			if (s.length > 2) {
+			if (s.length != 2) {
 				return false;
 			}
 			String decimals = s[s.length - 1];

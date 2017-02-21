@@ -22,7 +22,7 @@ public class Model {
 			fundDAO = new FundDAO(pool, "fund");
 			positionDAO = new PositionDAO(pool, "position");
 			transactionDAO = new TransactionDAO(pool, "transaction");
-			
+
 			generateInitEmployee();
 		} catch (DAOException e) {
 			System.out.println(e.getMessage());

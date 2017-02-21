@@ -140,7 +140,7 @@ public class CoreActions {
 			} catch (RollbackException e) {
 				message.setMessage(e.getMessage());
 				return message;
-			}
+			} 
 			return viewPortfolio(request);
 		}
 		return message;
@@ -214,6 +214,8 @@ public class CoreActions {
 			return message;
 		} catch (JSONException e) {
 			message.setMessage(e.getMessage());
+		} catch (NullPointerException e) {
+			message.setMessage(e.getMessage());
 		}
 		
 		return message;
@@ -271,6 +273,8 @@ public class CoreActions {
 			return message;
 		} catch (JSONException e) {
 			message.setMessage(e.getMessage());
+		}  catch (NullPointerException e) {
+			message.setMessage(e.getMessage());
 		}
 		
 		return message;
@@ -310,6 +314,8 @@ public class CoreActions {
 			message.setMessage(e.getMessage());
 			return message;
 		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
+		} catch (NullPointerException e) {
 			message.setMessage(e.getMessage());
 		}
 		
@@ -351,6 +357,8 @@ public class CoreActions {
 			message.setMessage(e.getMessage());
 		} catch (JSONException e) {
 			message.setMessage(e.getMessage());
+		} catch (NullPointerException e) {
+			message.setMessage(e.getMessage());
 		}
 		
 		return message;
@@ -383,6 +391,8 @@ public class CoreActions {
 			message.setMessage(e.getMessage());
 		} catch (RollbackException e) {
 			message.setMessage(e.getMessage());
+		} catch (NullPointerException e) {
+			message.setMessage(e.getMessage());
 		}
 		
 		Response.status(200).build();
@@ -394,12 +404,17 @@ public class CoreActions {
 	@Produces(MediaType.APPLICATION_JSON)
 	public MessageBean logout(@Context HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		if (session.getAttribute("user") != null) {
-			clearSession(request);
-			message.setMessage("You have been successfully logged out");
-		} else {
-			message.setMessage("You are not currently logged in");
+		try {
+			if (session.getAttribute("user") != null) {
+				clearSession(request);
+				message.setMessage("You have been successfully logged out");
+			} else {
+				message.setMessage("You are not currently logged in");
+			}
+		}  catch (NullPointerException e) {
+			message.setMessage(e.getMessage());
 		}
+		
 		return message;
 	}
 	
@@ -437,6 +452,8 @@ public class CoreActions {
 		} catch (RollbackException e) {
 			
 		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
+		} catch (NullPointerException e) {
 			message.setMessage(e.getMessage());
 		}
 		
@@ -490,6 +507,8 @@ public class CoreActions {
 			return message;
 		} catch (JSONException e) {
 			message.setMessage(e.getMessage());
+		} catch (NullPointerException e) {
+			message.setMessage(e.getMessage());
 		}
 		
 		return message;
@@ -528,6 +547,8 @@ public class CoreActions {
 			message.setMessage(e.getMessage());
 			return message;
 		} catch (JSONException e) {
+			message.setMessage(e.getMessage());
+		} catch (NullPointerException e) {
 			message.setMessage(e.getMessage());
 		}
 		
@@ -579,6 +600,8 @@ public class CoreActions {
 		} catch (JSONException e) {
 			pfb.setMessage(e.getMessage());
 			return pfb;
+		} catch (NullPointerException e) {
+			message.setMessage(e.getMessage());
 		}
 		
 		return pfb;

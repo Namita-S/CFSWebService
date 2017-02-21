@@ -42,17 +42,17 @@ import com.team1.webservice.model.UserDAO;
 
 @Path("/")
 public class CoreActions {
-	private Model model;
+	/*private Model model;
 	private UserDAO userDAO;
 	private FundDAO fundDAO;
-	private PositionDAO positionDAO;
+	private PositionDAO positionDAO;*/
 	private MessageBean message;
 	
 	public CoreActions() {
-		model = new Model();
+		/*model = new Model();
 		userDAO = model.getUserDAO();
 		fundDAO = model.getFundDAO();
-		positionDAO = model.getPositionDAO();
+		positionDAO = model.getPositionDAO();*/
 		message = new MessageBean();
 	}
 	
@@ -132,7 +132,7 @@ public class CoreActions {
 				return message;
 			}
 			try {
-				PositionBean[] pbs = positionDAO.getPositionsOfCustomer(user.getUserID());
+				PositionBean[] pbs = Model.getPositionDAO().getPositionsOfCustomer(user.getUserID());
 				if (pbs == null) {
 					message.setMessage("You don't have any funds in your Portfolio");
 					return message;
@@ -168,7 +168,7 @@ public class CoreActions {
 			
 			// check if the customer can afford at least one share of the fund
 			String symbol = bfb.getSymbol();
-			FundBean fb = fundDAO.getFundBySymbol(symbol);
+			FundBean fb = Model.getFundDAO().getFundBySymbol(symbol);
 			if (fb == null) { // check if the fund exists
 				message.setMessage("The input you provided is not valid");
 				Transaction.commit();
@@ -191,19 +191,19 @@ public class CoreActions {
 			// calculate the whole number of shares the customer can buy
 			int shares = (int) Math.floor(buyAmount / price);
 			user.setCash(balance - shares * price);
-			userDAO.update(user);
+			Model.getUserDAO().update(user);
 			
 			// update position db or create a new position for the customer
-			PositionBean pb = positionDAO.getPositionById(user.getUserID(), fb.getFundID());
+			PositionBean pb = Model.getPositionDAO().getPositionById(user.getUserID(), fb.getFundID());
 			if (pb != null) {
 				pb.setShares(pb.getShares() + shares);
-				positionDAO.update(pb);
+				Model.getPositionDAO().update(pb);
 			} else {
 				PositionBean newPb = new PositionBean();
 				newPb.setCustomerID(user.getUserID());
 				newPb.setShares(shares);
 				newPb.setFundID(fb.getFundID());
-				positionDAO.create(newPb);
+				Model.getPositionDAO().create(newPb);
 			}
 			
 			Transaction.commit();
@@ -247,7 +247,7 @@ public class CoreActions {
 		try {
 			// check if about-to-be registered account already exists
 			String username = ccb.getUsername();
-			if (userDAO.getUserByUsername(username) != null) {
+			if (Model.getUserDAO().getUserByUsername(username) != null) {
 				message.setMessage("The input you provided is not valid");
 				return message;
 			}
@@ -264,7 +264,7 @@ public class CoreActions {
 			newUser.setZip(ccb.getZip());
 			newUser.setUsername(ccb.getUsername());
 			Transaction.begin();
-			userDAO.create(newUser);
+			Model.getUserDAO().create(newUser);
 			Transaction.commit();
 			
 			message.setMessage(ccb.getFirstName() + " was registered successfully");
@@ -295,7 +295,7 @@ public class CoreActions {
 		}
 		
 		try {
-			if (fundDAO.getFundBySymbol(cfb.getSymbol()) != null) {
+			if (Model.getFundDAO().getFundBySymbol(cfb.getSymbol()) != null) {
 				message.setMessage("The input you provided is not valid");
 				return message;
 			}
@@ -306,7 +306,7 @@ public class CoreActions {
 			fb.setPrice(Double.parseDouble(cfb.getInitValue()));
 			fb.setDateCreated(getSystemTime());
 			Transaction.begin();
-			fundDAO.create(fb);
+			Model.getFundDAO().create(fb);
 			Transaction.commit();
 			
 			message.setMessage("The fund was successfully created");
@@ -341,7 +341,7 @@ public class CoreActions {
 			
 			// lock the db from this point
 			Transaction.begin();
-			UserBean user = userDAO.getUserByUsername(username);
+			UserBean user = Model.getUserDAO().getUserByUsername(username);
 			if (user == null) {
 				message.setMessage("The input you provided is not valid");
 				Transaction.commit();
@@ -349,7 +349,7 @@ public class CoreActions {
 			}
 			
 			user.setCash(user.getCash() + Double.parseDouble(db.getCash()));
-			userDAO.update(user);
+			Model.getUserDAO().update(user);
 			// release the lock on db
 			Transaction.commit();
 			message.setMessage("The check was successfully deposited");
@@ -374,9 +374,9 @@ public class CoreActions {
 		try {
 			String username = loginBean.getUsername();
 			String password = loginBean.getPassword();
-			UserBean user = userDAO.getUserByUsername(username);
+			UserBean user = Model.getUserDAO().getUserByUsername(username);
 			
-			boolean isVerified = userDAO.verifyUser(username, password);
+			boolean isVerified = Model.getUserDAO().verifyUser(username, password);
 			if (!isVerified) {
 				message.setMessage("There seems to be an issue with " + 
 						"the username/password combination that you entered");
@@ -445,7 +445,7 @@ public class CoreActions {
 			}
 			
 			user.setCash(balance - requestAmount);
-			userDAO.update(user);
+			Model.getUserDAO().update(user);
 			Transaction.commit();
 			message.setMessage("The check has been successfully requested");
 			
@@ -478,14 +478,14 @@ public class CoreActions {
 		try {
 			UserBean user = (UserBean) request.getSession().getAttribute("user");
 			Transaction.begin();
-			FundBean fb = fundDAO.getFundBySymbol(sfb.getSymbol());
+			FundBean fb = Model.getFundDAO().getFundBySymbol(sfb.getSymbol());
 			if (fb == null) {
 				message.setMessage("The input you provided is not valid");
 				Transaction.commit();
 				return message;
 			}
 			
-			PositionBean pb = positionDAO.getPositionById(user.getUserID(), fb.getFundID());
+			PositionBean pb = Model.getPositionDAO().getPositionById(user.getUserID(), fb.getFundID());
 			int shares = (int) Integer.parseInt(sfb.getShares());
 			if (pb == null || pb.getShares() < shares) {
 				message.setMessage("You don't have that many shares in your portfolio");
@@ -495,9 +495,9 @@ public class CoreActions {
 			
 			double moneyEarned = shares * fb.getPrice();
 			user.setCash(user.getCash() + moneyEarned);
-			userDAO.update(user);
+			Model.getUserDAO().update(user);
 			pb.setShares(pb.getShares() - shares);
-			positionDAO.update(pb);
+			Model.getPositionDAO().update(pb);
 			Transaction.commit();
 			
 			message.setMessage("The shares have been successfully sold");
@@ -524,7 +524,7 @@ public class CoreActions {
 		
 		try {
 			Transaction.begin();
-			FundBean[] fbs = fundDAO.getAllFunds();
+			FundBean[] fbs = Model.getFundDAO().getAllFunds();
 			// return if no fund in db
 			if (fbs == null) {
 				message.setMessage("The fund prices have been successfully recalculated");
@@ -537,7 +537,7 @@ public class CoreActions {
 				double flucRate = getFlucRate();
 				double newPrice = Double.parseDouble(df.format(price + (price * flucRate)));
 				fb.setPrice(newPrice);
-				fundDAO.update(fb);
+				Model.getFundDAO().update(fb);
 			}
 			
 			Transaction.commit();
@@ -572,7 +572,7 @@ public class CoreActions {
 		}
 		
 		try {
-			PositionBean[] pbs = positionDAO.getPositionsOfCustomer(user.getUserID());
+			PositionBean[] pbs = Model.getPositionDAO().getPositionsOfCustomer(user.getUserID());
 			if (pbs == null) {
 				pfb.setMessage("You don't have any funds in your Portfolio");
 				return pfb;
@@ -582,8 +582,8 @@ public class CoreActions {
 			
 			for (PositionBean pb : pbs) {
 				JacksonFund jf = new JacksonFund();
-				String name = fundDAO.getFundById(pb.getFundID()).getName();
-				double price = fundDAO.getFundById(pb.getFundID()).getPrice();
+				String name = Model.getFundDAO().getFundById(pb.getFundID()).getName();
+				double price = Model.getFundDAO().getFundById(pb.getFundID()).getPrice();
 				jf.setName(name);
 				jf.setPrice(Double.toString(price));
 				jf.setShares(Double.toString(pb.getShares()));

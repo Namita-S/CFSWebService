@@ -24,12 +24,25 @@
           <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
           <param-value>true</param-value>
         </init-param>
+        <init-param>
+          <param-name>jdbcDriverName</param-name>
+          <param-value>com.mysql.jdbc.Driver</param-value>
+        </init-param>
+        <init-param>
+          <param-name>jdbcURL</param-name>
+          <param-value>jdbc:mysql:///test?useSSL=false</param-value>
+        </init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>Jersey Web Application</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
+	<listener>
+	  <listener-class>
+	              com.team1.webservice.servletinitialization.ServletInit
+	  </listener-class>
+	</listener>
 		<session-config>
 		<session-timeout> 15 </session-timeout>
 	</session-config>

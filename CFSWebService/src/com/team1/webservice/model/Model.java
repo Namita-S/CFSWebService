@@ -8,10 +8,10 @@ import org.genericdao.Transaction;
 import com.team1.webservice.databean.UserBean;
 
 public class Model {
-	private UserDAO userDAO;
-	private FundDAO fundDAO;
-	private PositionDAO positionDAO;
-	private TransactionDAO transactionDAO;
+	private static UserDAO userDAO;
+	private static FundDAO fundDAO;
+	private static PositionDAO positionDAO;
+	private static TransactionDAO transactionDAO;
 	
 	public Model() {
 		try {
@@ -23,26 +23,29 @@ public class Model {
 			fundDAO = new FundDAO(pool, "fund");
 			positionDAO = new PositionDAO(pool, "position");
 			transactionDAO = new TransactionDAO(pool, "transaction");
-
-			generateInitEmployee();
+			if(userDAO.getCount() == 0){
+				generateInitEmployee();
+			}
 		} catch (DAOException e) {
 			System.out.println(e.getMessage());
-		} 
+		} catch (RollbackException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public UserDAO getUserDAO() {
+	public static UserDAO getUserDAO() {
 		return userDAO;
 	}
 	
-	public FundDAO getFundDAO() {
+	public static FundDAO getFundDAO() {
 		return fundDAO;
 	}
 
-	public PositionDAO getPositionDAO() {
+	public static PositionDAO getPositionDAO() {
 		return positionDAO;
 	}
 
-	public TransactionDAO getTransactionDAO() {
+	public static TransactionDAO getTransactionDAO() {
 		return transactionDAO;
 	}
 	
